@@ -105,11 +105,11 @@ double GetFeature(cv::Mat &image,cv::Mat &shape,cv::Mat &con,cv::Mat &tri,cv::Ma
 	
     if(visi.at<int>(i,0) == 0)continue;
     p[i] = cv::Point(shape.at<double>(i,0),shape.at<double>(i+n,0));
-	if (first) initial[i] = p[i];
+	//if (first) initial[i] = p[i];
     c = CV_RGB(255,255,0); //cv::circle(image,p[i],2,c);
-	energy += (p[i].x-initial[i].x)*(p[i].x-initial[i].x) + (p[i].y-initial[i].y)*(p[i].y-initial[i].y);
-	features.push_back(p[i].x-initial[i].x);
-	features.push_back(p[i].y-initial[i].y);	
+	//energy += (p[i].x-initial[i].x)*(p[i].x-initial[i].x) + (p[i].y-initial[i].y)*(p[i].y-initial[i].y);
+	//features.push_back(p[i].x-initial[i].x);
+	//features.push_back(p[i].y-initial[i].y);	
 	}
 	
 	//for (int i = 0 ;i<features.size(); i++)
@@ -196,6 +196,24 @@ double GetFeature(cv::Mat &image,cv::Mat &shape,cv::Mat &con,cv::Mat &tri,cv::Ma
   dstTri[2] = cv::Point2f( col*0.5, row*0.73 );
   
   warp_mat = getAffineTransform( srcTri, dstTri );
+  
+  
+  std::vector<cv::Point2f> fpoints;
+  for( int i = 0; i < 66; i++ )
+      fpoints.push_back(cv::Point2f(p[i].x,p[i].y));
+
+  cv::transform(fpoints,fpoints,warp_mat);  
+  
+  
+  for (int i = 0; i < 66; i++)
+  {
+	  if (first) initial[i] = fpoints[i];
+  	  energy += (fpoints[i].x-initial[i].x)*(fpoints[i].x-initial[i].x) + (fpoints[i].y-initial[i].y)*(fpoints[i].y-initial[i].y);
+  	  features.push_back(fpoints[i].x-initial[i].x);
+  	  features.push_back(fpoints[i].y-initial[i].y);	
+  
+  }
+  
 
      /// Apply the Affine Transform just found to the src image
      warpAffine( image, warp_dst, warp_mat, warp_dst.size() );
@@ -575,7 +593,7 @@ int main(int argc,  char** argv)
 
 
 		   cout<<energy<<endl;
-		   if (energy > 7000)
+		   if (energy > 1500)
 		   {
 		   pValue = PyObject_CallMethod(pInstance, "make_prediction", "[i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i]",features[0],features[1],features[2],features[3],features[4],features[5],features[6],features[7],features[8],features[9],features[10],features[11],features[12],features[13],features[14],features[15],features[16],features[17],features[18],features[19],features[20],features[21],features[22],features[23],features[24],features[25],features[26],features[27],features[28],features[29],features[30],features[31],features[32],features[33],features[34],features[35],features[36],features[37],features[38],features[39],features[40],features[41],features[42],features[43],features[44],features[45],features[46],features[47],features[48],features[49],features[50],features[51],features[52],features[53],features[54],features[55],features[56],features[57],features[58],features[59],features[60],features[61],features[62],features[63],features[64],features[65],features[66],features[67],features[68],features[69],features[70],features[71],features[72],features[73],features[74],features[75],features[76],features[77],features[78],features[79],features[80],features[81],features[82],features[83],features[84],features[85],features[86],features[87],features[88],features[89],features[90],features[91],features[92],features[93],features[94],features[95],features[96],features[97],features[98],features[99],features[100],features[101],features[102],features[103],features[104],features[105],features[106],features[107],features[108],features[109],features[110],features[111],features[112],features[113],features[114],features[115],features[116],features[117],features[118],features[119],features[120],features[121],features[122],features[123],features[124],features[125],features[126],features[127],features[128],features[129],features[130],features[131] );
 		   if (pValue != NULL) 
